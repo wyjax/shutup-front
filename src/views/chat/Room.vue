@@ -1,11 +1,7 @@
 <template>
   <div class="room" id="message-list">
     <div>채팅</div>
-    <div v-for="message in messages" v-bind:key="message">
-      <p class="name-area">{{ message.name }}</p>
-      <p class="content-area">{{ message.content }}</p>
-    </div>
-
+    <chat-message v-for="(message, idx) in messages" :message="message" :key="idx"></chat-message>
     <div>
       <input type="text" v-model="name">
       <input type="text" v-model="message">
@@ -17,8 +13,10 @@
 <script>
 import {EventBus} from '../../event/eventIndex'
 import {connect, disConnect, sendMessage} from '../../api/socket'
+import ChatMessage from '../../components/chat/ChatMessage'
 
 export default {
+  components: {ChatMessage},
   data () {
     return {
       name: 'test',
@@ -32,7 +30,17 @@ export default {
   mounted () {
     EventBus.$on('selectRoom', uuid => {
       disConnect()
+      this.messages = []
       this.connect(uuid)
+    })
+    EventBus.$on('receiveMessage', message => {
+      const msg = {
+        name: message.sender,
+        uuid: message.uuid,
+        content: message.content
+      }
+      this.messages.push(msg)
+      console.log(this.messages)
     })
   },
   computed: {
@@ -59,17 +67,4 @@ export default {
 </script>
 
 <style scoped>
-.room p {
-  text-align: left;
-}
-
-.name-area {
-  margin: 0;
-  font-weight: bold;
-}
-
-.content-area {
-  margin: 0 0 10px;
-  padding-left: 20px;
-}
 </style>

@@ -1,5 +1,6 @@
 import Stomp from 'webstomp-client'
 import SockJS from 'sockjs-client'
+import {EventBus} from '../event/eventIndex'
 
 let socket
 let stompClient
@@ -40,18 +41,20 @@ export const sendMessage = (message) => {
 
 export const onMessageReceived = (payload) => {
   const message = JSON.parse(payload.body)
-  var messageElement = document.createElement('div')
-  var nameArea = document.createElement('p')
-  var messageArea = document.createElement('p')
-
-  nameArea.classList.add('name-area')
-  messageArea.classList.add('content-area')
-
-  nameArea.appendChild(document.createTextNode(message.sender))
-  messageArea.appendChild(document.createTextNode(message.content))
-  messageElement.appendChild(nameArea)
-  messageElement.appendChild(messageArea)
-
-  const messageList = document.querySelector('.room')
-  messageList.appendChild(messageElement)
+  EventBus.$emit('receiveMessage', message)
+  // const message = JSON.parse(payload.body)
+  // var messageElement = document.createElement('div')
+  // var nameArea = document.createElement('p')
+  // var messageArea = document.createElement('p')
+  //
+  // nameArea.classList.add('name-area')
+  // messageArea.classList.add('content-area')
+  //
+  // nameArea.appendChild(document.createTextNode(message.sender))
+  // messageArea.appendChild(document.createTextNode(message.content))
+  // messageElement.appendChild(nameArea)
+  // messageElement.appendChild(messageArea)
+  //
+  // const messageList = document.querySelector('.room')
+  // messageList.appendChild(messageElement)
 }
