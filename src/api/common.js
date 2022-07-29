@@ -4,7 +4,10 @@ function create (url) {
   const instance = axios.create(
     Object.assign({
       baseURL: url,
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
     })
   )
   return instance

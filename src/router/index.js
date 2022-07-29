@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import MainView from '@/view/MainView'
+import mainView from '../views/MainView'
 
 Vue.use(Router)
 
@@ -9,7 +9,7 @@ export default new Router({
     {
       path: '/',
       name: 'MainView',
-      component: MainView
+      component: mainView
     }
   ]
 })

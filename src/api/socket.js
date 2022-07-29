@@ -1,119 +1,55 @@
-'use strict'
+import Stomp from 'webstomp-client'
+import SockJS from 'sockjs-client'
 
-var usernamePage = document.querySelector('#username-page')
-var chatPage = document.querySelector('#chat-page')
-var usernameForm = document.querySelector('#usernameForm')
-var messageForm = document.querySelector('#messageForm')
-var messageInput = document.querySelector('#message')
-var messageArea = document.querySelector('#messageArea')
-var connectingElement = document.querySelector('.connecting')
+let socket
+let stompClient
 
-var stompClient = null
-var username = null
-
-var colors = [
-  '#2196F3', '#32c787', '#00BCD4', '#ff5652',
-  '#ffc107', '#ff85af', '#FF9800', '#39bbb0'
-]
-
-function connect (event) {
-  username = document.querySelector('#name').value.trim()
-  const roomName = document.querySelector('#roomName').value.trim()
-
-  if (username) {
-    usernamePage.classList.add('hidden')
-    chatPage.classList.remove('hidden')
-
-    var socket = new SockJS('/shut-up')
-    stompClient = Stomp.over(socket)
-    const headers = {
-      username: username,
-      roomName: roomName
-    }
-    stompClient.connect(headers, onConnected, onError)
-  }
-  event.preventDefault()
+export const connect = () => {
+  socket = new SockJS('http://localhost:8080/shut-up')
+  stompClient = Stomp.over(socket)
+  stompClient.connect({}, onConnected, onError)
+  return stompClient
 }
 
-function onConnected () {
-  // Subscribe to the Public Topic
+export const onConnected = () => {
   stompClient.subscribe('/topic/public', onMessageReceived)
-
-  // Tell your username to the server
   stompClient.send('/app/chat.addUser',
-    {},
-    JSON.stringify({sender: username, type: 'JOIN'})
+    JSON.stringify({sender: 'jk', type: 'JOIN'})
   )
-
-  connectingElement.classList.add('hidden')
 }
 
-function onError (error) {
-  connectingElement.textContent = 'Could not connect to WebSocket server. Please refresh this page to try again!'
-  connectingElement.style.color = 'red'
-}
-
-function sendMessage (event) {
-  var messageContent = messageInput.value.trim()
-
-  if (messageContent && stompClient) {
-    var chatMessage = {
-      sender: username,
-      content: messageInput.value,
-      type: 'CHAT'
-    }
-    stompClient.send('/app/chat.sendMessage', {}, JSON.stringify(chatMessage))
-    messageInput.value = ''
+export const disConnect = () => {
+  if (socket || stompClient) {
+    socket.close()
+    socket = null
+    stompClient = null
   }
-  event.preventDefault()
 }
 
-function onMessageReceived (payload) {
-  var message = JSON.parse(payload.body)
+export const onError = (error) => {
+  console.log(error)
+}
 
-  var messageElement = document.createElement('li')
-
-  if (message.type === 'JOIN') {
-    messageElement.classList.add('event-message')
-    message.content = message.sender + ' joined!'
-  } else if (message.type === 'LEAVE') {
-    messageElement.classList.add('event-message')
-    message.content = message.sender + ' left!'
-  } else {
-    messageElement.classList.add('chat-message')
-
-    var avatarElement = document.createElement('i')
-    var avatarText = document.createTextNode(message.sender[0])
-    avatarElement.appendChild(avatarText)
-    avatarElement.style['background-color'] = getAvatarColor(message.sender)
-
-    messageElement.appendChild(avatarElement)
-
-    var usernameElement = document.createElement('span')
-    var usernameText = document.createTextNode(message.sender)
-    usernameElement.appendChild(usernameText)
-    messageElement.appendChild(usernameElement)
+export const sendMessage = (message) => {
+  if (stompClient) {
+    stompClient.send('/app/chat/' + message.uuid, JSON.stringify(message))
   }
-
-  var textElement = document.createElement('p')
-  var messageText = document.createTextNode(message.content)
-  textElement.appendChild(messageText)
-
-  messageElement.appendChild(textElement)
-
-  messageArea.appendChild(messageElement)
-  messageArea.scrollTop = messageArea.scrollHeight
 }
 
-function getAvatarColor (messageSender) {
-  var hash = 0
-  for (var i = 0; i < messageSender.length; i++) {
-    hash = 31 * hash + messageSender.charCodeAt(i)
-  }
+export const onMessageReceived = (payload) => {
+  const message = JSON.parse(payload.body)
+  var messageElement = document.createElement('div')
+  var nameArea = document.createElement('p')
+  var messageArea = document.createElement('p')
 
-  var index = Math.abs(hash % colors.length)
-  return colors[index]
+  nameArea.classList.add('name-area')
+  messageArea.classList.add('content-area')
+
+  nameArea.appendChild(document.createTextNode(message.sender))
+  messageArea.appendChild(document.createTextNode(message.content))
+  messageElement.appendChild(nameArea)
+  messageElement.appendChild(messageArea)
+
+  const messageList = document.querySelector('.room')
+  messageList.appendChild(messageElement)
 }
-
-usernameForm.addEventListener('submit', connect, true)
-messageForm.addEventListener('submit', sendMessage, true)

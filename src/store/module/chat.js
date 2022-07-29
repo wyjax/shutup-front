@@ -1,13 +1,17 @@
 export default {
   state: {
-    selectRoomId: 0
+    selectedUuid: 0
   },
   getters: {
     getSelectedRoomId (state) {
-      return state.selectRoomId
+      return state.selectedUuid
     }
   },
-  mutations: {},
+  mutations: {
+    selectedRoom (state, payload) {
+      this.state.selectedUuid = payload
+    }
+  },
   actions: {
 
   }
