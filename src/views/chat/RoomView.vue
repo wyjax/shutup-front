@@ -38,7 +38,7 @@ export default {
         })
     },
     selectRoom (uuid) {
-      // this.$store.commit('selectedRoom', uuid)
+      this.$store.commit('selectedRoom', uuid)
       EventBus.$emit('selectRoom', uuid)
     }
   }

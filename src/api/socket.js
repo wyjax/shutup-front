@@ -4,22 +4,24 @@ import SockJS from 'sockjs-client'
 let socket
 let stompClient
 
-export const connect = () => {
-  socket = new SockJS('http://localhost:8080/shut-up')
+export const connect = (uuid) => {
+  socket = new SockJS('http://localhost:8082/shut-up')
   stompClient = Stomp.over(socket)
-  stompClient.connect({}, onConnected, onError)
+  stompClient.connect({}, () => {
+    stompClient.subscribe('/sub/chat/' + uuid, onMessageReceived)
+  }, onError)
   return stompClient
 }
 
-export const onConnected = () => {
-  stompClient.subscribe('/topic/public', onMessageReceived)
+export const onConnected = (uuid) => {
+  stompClient.subscribe('/sub/chat/' + uuid, onMessageReceived)
   stompClient.send('/app/chat.addUser',
     JSON.stringify({sender: 'jk', type: 'JOIN'})
   )
 }
 
 export const disConnect = () => {
-  if (socket || stompClient) {
+  if (socket) {
     socket.close()
     socket = null
     stompClient = null
@@ -32,7 +34,7 @@ export const onError = (error) => {
 
 export const sendMessage = (message) => {
   if (stompClient) {
-    stompClient.send('/app/chat/' + message.uuid, JSON.stringify(message))
+    stompClient.send('/pub/chat/' + message.uuid, JSON.stringify(message))
   }
 }
 

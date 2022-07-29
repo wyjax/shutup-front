@@ -7,6 +7,7 @@
     </div>
 
     <div>
+      <input type="text" v-model="name">
       <input type="text" v-model="message">
       <button @click="send">전송</button>
     </div>
@@ -20,6 +21,7 @@ import {connect, disConnect, sendMessage} from '../../api/socket'
 export default {
   data () {
     return {
+      name: 'test',
       messages: [],
       eventBus: '',
       connection: null,
@@ -41,11 +43,11 @@ export default {
   methods: {
     connect (uuid) {
       this.uuid = uuid
-      this.connection = connect()
+      this.connection = connect(uuid)
     },
     send () {
       const messageModel = {
-        sender: '',
+        sender: this.name,
         uuid: this.uuid,
         content: this.message
       }
