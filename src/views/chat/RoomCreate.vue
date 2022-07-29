@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label for="username">이름</label>
+    <label for="username">방이름</label>
     <input id="username" v-model="room.name">
     <button @click="createRoom">만들기</button>
   </div>

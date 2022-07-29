@@ -1,19 +1,22 @@
 <template>
-  <div class="room" id="message-list">
-    <div>채팅</div>
-    <chat-message v-for="(message, idx) in messages" :message="message" :key="idx"></chat-message>
+  <div>
+    <div id="roomName">{{ room.name }}</div>
+    <div class="room" id="message-list">
+      <chat-message v-for="(message, idx) in messages" :message="message" :key="idx"></chat-message>
+    </div>
     <div>
       <input type="text" v-model="name">
-      <input type="text" v-model="message">
+      <input type="text" v-model="message" @keyup.enter="send">
       <button @click="send">전송</button>
     </div>
   </div>
-</template>
+</template> 5 40
 
 <script>
 import {EventBus} from '../../event/eventIndex'
 import {connect, disConnect, sendMessage} from '../../api/socket'
 import ChatMessage from '../../components/chat/ChatMessage'
+import {getMessages} from '../../api/chat'
 
 export default {
   components: {ChatMessage},
@@ -24,23 +27,23 @@ export default {
       eventBus: '',
       connection: null,
       message: '',
-      uuid: ''
+      room: {}
     }
   },
   mounted () {
-    EventBus.$on('selectRoom', uuid => {
+    EventBus.$on('selectRoom', room => {
       disConnect()
-      this.messages = []
-      this.connect(uuid)
+      this.room = room
+      this.init()
+      this.connect()
     })
     EventBus.$on('receiveMessage', message => {
       const msg = {
-        name: message.sender,
+        name: message.name,
         uuid: message.uuid,
         content: message.content
       }
       this.messages.push(msg)
-      console.log(this.messages)
     })
   },
   computed: {
@@ -49,14 +52,20 @@ export default {
     }
   },
   methods: {
-    connect (uuid) {
-      this.uuid = uuid
-      this.connection = connect(uuid)
+    init () {
+      getMessages(this.room.uuid).then(result => {
+        this.messages = result.data
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+    connect () {
+      this.connection = connect(this.room.uuid)
     },
     send () {
       const messageModel = {
-        sender: this.name,
-        uuid: this.uuid,
+        name: this.name,
+        uuid: this.room.uuid,
         content: this.message
       }
       sendMessage(messageModel)
@@ -67,4 +76,12 @@ export default {
 </script>
 
 <style scoped>
+#roomName {
+  background-color: #333;
+  padding:10px
+}
+.room {
+  height: 427px;
+  overflow-y: auto;
+}
 </style>

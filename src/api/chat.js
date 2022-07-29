@@ -11,3 +11,7 @@ export const registerRoom = async data => {
 export const enterRoom = async data => {
   return common.get(`/api/chat/room/` + data)
 }
+
+export const getMessages = async uuid => {
+  return common.get(`/api/chat/room/` + uuid + `/messages`)
+}

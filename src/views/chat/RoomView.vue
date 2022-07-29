@@ -4,7 +4,7 @@
       방목록
     </div>
     <ul>
-      <li v-for="(room, idx) in rooms" v-bind:key="idx" @click="selectRoom(room.uuid)">
+      <li v-for="(room, idx) in rooms" v-bind:key="idx" @click="selectRoom(room)">
         {{ room.name }}
       </li>
     </ul>
@@ -37,9 +37,9 @@ export default {
           console.log('목록 가져오는데 실패')
         })
     },
-    selectRoom (uuid) {
-      this.$store.commit('selectedRoom', uuid)
-      EventBus.$emit('selectRoom', uuid)
+    selectRoom (room) {
+      this.$store.commit('selectedRoom', room.uuid)
+      EventBus.$emit('selectRoom', room)
     }
   }
 }

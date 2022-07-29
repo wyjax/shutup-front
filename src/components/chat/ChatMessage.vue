@@ -22,7 +22,9 @@ export default {
 }
 
 .content-area {
-  margin: 0 0 10px;
-  padding-left: 20px;
+  margin: 10px 10px 10px 20px;
+  padding: 5px;
+  border: 1px solid white;
+  border-radius: 10px;
 }
 </style>
