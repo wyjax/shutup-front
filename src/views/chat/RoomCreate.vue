@@ -8,6 +8,7 @@
 
 <script>
 import {registerRoom} from '../../api/chat'
+import {EventBus} from '../../event/eventIndex'
 
 export default {
   data () {
@@ -22,10 +23,11 @@ export default {
       const data = {
         name: this.room.name
       }
-      registerRoom(data).then(() => {
-        alert('성공')
-      }).catch(() => {
-        alert('실패')
+      registerRoom(data).then(response => {
+        const data = response.data
+        if (data) {
+          EventBus.$emit('createdRoom', data)
+        }
       })
       this.initModel()
     },

@@ -1,6 +1,6 @@
 export default {
   state: {
-    selectedUuid: 0
+    selectedUuid: ''
   },
   getters: {
     getSelectedRoomId (state) {
@@ -8,8 +8,8 @@ export default {
     }
   },
   mutations: {
-    selectedRoom (state, payload) {
-      this.state.selectedUuid = payload
+    selectedRoom (state, uuid) {
+      this.state.selectedUuid = uuid
     }
   },
   actions: {

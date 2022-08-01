@@ -1,16 +1,15 @@
 <template>
   <div>
     <div id="roomName">{{ room.name }}</div>
-    <div class="room" id="message-list">
+    <div class="room beauty-scroll" id="message-list">
       <chat-message v-for="(message, idx) in messages" :message="message" :key="idx"></chat-message>
     </div>
     <div>
-      <input type="text" v-model="name">
       <input type="text" v-model="message" @keyup.enter="send">
       <button @click="send">전송</button>
     </div>
   </div>
-</template> 5 40
+</template>
 
 <script>
 import {EventBus} from '../../event/eventIndex'
@@ -22,12 +21,13 @@ export default {
   components: {ChatMessage},
   data () {
     return {
-      name: 'test',
       messages: [],
       eventBus: '',
       connection: null,
       message: '',
-      room: {}
+      room: {},
+      user: {},
+      target: {}
     }
   },
   mounted () {
@@ -39,12 +39,16 @@ export default {
     })
     EventBus.$on('receiveMessage', message => {
       const msg = {
-        name: message.name,
         uuid: message.uuid,
+        name: message.name,
+        loginId: message.loginId,
         content: message.content
       }
       this.messages.push(msg)
+      this.setScroll(msg.loginId)
     })
+    this.user = this.$store.getters.getLoginUser
+    this.target = document.querySelector('#message-list')
   },
   computed: {
     roomUUid () {
@@ -55,8 +59,6 @@ export default {
     init () {
       getMessages(this.room.uuid).then(result => {
         this.messages = result.data
-      }).catch(error => {
-        console.log(error)
       })
     },
     connect () {
@@ -64,12 +66,22 @@ export default {
     },
     send () {
       const messageModel = {
-        name: this.name,
         uuid: this.room.uuid,
+        name: this.user.nickname,
+        loginId: this.user.loginId,
         content: this.message
       }
       sendMessage(messageModel)
       this.message = ''
+    },
+    setScroll (loginId) {
+      if (this.user.loginId !== loginId) {
+        return
+      }
+      setTimeout(function () {
+        const target = document.querySelector('#message-list')
+        target.scrollTop = target.scrollHeight
+      }, 100)
     }
   }
 }
@@ -83,5 +95,9 @@ export default {
 .room {
   height: 427px;
   overflow-y: auto;
+}
+
+#message-list {
+  overflow-y: scroll;
 }
 </style>

@@ -18,15 +18,22 @@ import {EventBus} from '../../event/eventIndex'
 export default {
   data () {
     return {
-      rooms: []
+      rooms: [],
+      user: this.$store.getters.getLoginUser
     }
   },
   mounted () {
     this.getRooms()
+    EventBus.$on('createdRoom', data => {
+      this.addRoom(data)
+    })
   },
   methods: {
-    clickRoom (id) {
-
+    addRoom (room) {
+      if (!this.rooms) {
+        this.rooms = []
+      }
+      this.rooms.push(room)
     },
     getRooms () {
       getRooms()

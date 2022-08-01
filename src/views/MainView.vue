@@ -52,4 +52,15 @@ div {
   float: right;
   box-sizing: border-box;
 }
+
+.beauty-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.beauty-scroll::-webkit-scrollbar-thumb {
+  background-color: #2f3542;
+  width: 5px;
+}
+.beauty-scroll::-webkit-scrollbar-track {
+  background-color: grey;
+}
 </style>
