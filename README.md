@@ -1,6 +1,8 @@
 # shutup-front
 
 > A Vue.js project
+Websocket & stomp Chat Service Fornt-end
+made by Vue.js
 
 ## Build Setup
 
