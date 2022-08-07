@@ -1,4 +1,4 @@
-# shutup-front
+# shutup-front (vue.js chat application)
 
 > A Vue.js project
 Websocket & stomp Chat Service Fornt-end
